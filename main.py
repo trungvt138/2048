@@ -24,6 +24,7 @@ MOVE_VEL = 20
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("2048")
 
+
 class Tile:
     COLORS = [
         (237, 229, 218),
@@ -74,6 +75,7 @@ class Tile:
         self.x += delta[0]
         self.y += delta[1]
 
+
 def draw_grid(window):
     for row in range(1, ROWS):
         y = row * RECT_HEIGHT
@@ -85,6 +87,7 @@ def draw_grid(window):
 
     pygame.draw.rect(window, OUTLINE_COLOR, (0, 0, WIDTH, HEIGHT), OUTLINE_THICKNESS)
 
+
 def draw(window, tiles):
     window.fill(BACKGROUND_COLOR)
 
@@ -94,6 +97,7 @@ def draw(window, tiles):
     draw_grid(window)
 
     pygame.display.update()
+
 
 def get_random_pos(tiles):
     row = None
@@ -107,11 +111,10 @@ def get_random_pos(tiles):
 
     return row, col
 
+
 def move_tiles(window, tiles, clock, direction):
-    global moveFlag
     updated = True
     blocks = set()
-    moveFlag = False  # Reset the moveFlag before moving tiles
 
     if direction == "left":
         sort_func = lambda x: x.col
@@ -170,8 +173,6 @@ def move_tiles(window, tiles, clock, direction):
             next_tile = get_next_tile(tile)
             if not next_tile:
                 tile.move(delta)
-                moveFlag = True  # Update moveFlag if any tile moves
-
             elif (
                     tile.value == next_tile.value
                     and tile not in blocks
@@ -179,14 +180,12 @@ def move_tiles(window, tiles, clock, direction):
             ):
                 if merge_check(tile, next_tile):
                     tile.move(delta)
-                    moveFlag = True  # Update moveFlag if any tile moves
                 else:
                     next_tile.value *= 2
                     sorted_tiles.pop(i)
                     blocks.add(next_tile)
             elif move_check(tile, next_tile):
                 tile.move(delta)
-                moveFlag = True  # Update moveFlag if any tile moves
             else:
                 continue
 
@@ -195,17 +194,17 @@ def move_tiles(window, tiles, clock, direction):
 
         update_tiles(window, tiles, sorted_tiles)
 
-    if moveFlag:
-        return end_move(tiles)
+    return end_move(tiles)
 
-    return None
 
 def end_move(tiles):
     if len(tiles) == 16:
         return "lost"
+
     row, col = get_random_pos(tiles)
     tiles[f"{row}{col}"] = Tile(random.choice([2, 4]), row, col)
     return "continue"
+
 
 def update_tiles(window, tiles, sorted_tiles):
     tiles.clear()
@@ -213,6 +212,7 @@ def update_tiles(window, tiles, sorted_tiles):
         tiles[f"{tile.row}{tile.col}"] = tile
 
     draw(window, tiles)
+
 
 def generate_tiles():
     tiles = {}
@@ -222,12 +222,12 @@ def generate_tiles():
 
     return tiles
 
+
 def main(window):
     clock = pygame.time.Clock()
     run = True
 
-    #tiles = generate_tiles()
-    tiles = {"00": Tile(2, 0, 0), "01": Tile(2, 0, 1), "02": Tile(4, 0, 2), "03": Tile(4, 0, 3)}
+    tiles = generate_tiles()
 
     while run:
         clock.tick(FPS)
@@ -250,6 +250,7 @@ def main(window):
         draw(window, tiles)
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main(WINDOW)
